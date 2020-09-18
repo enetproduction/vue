@@ -627,14 +627,13 @@ export function createPatchFunction (backend) {
           if (isDef(i = data) && isDef(i = i.domProps) && isDef(i = i.innerHTML)) {
             if (i !== elm.innerHTML) {
               /* istanbul ignore if */
-              if (process.env.NODE_ENV !== 'production' &&
-                typeof console !== 'undefined' &&
+              if (typeof console !== 'undefined' &&
                 !hydrationBailed
               ) {
                 hydrationBailed = true
-                console.warn('Parent: ', elm)
-                console.warn('server innerHTML: ', i)
-                console.warn('client innerHTML: ', elm.innerHTML)
+                console.warn('[SPARK] Parent: ', elm)
+                console.warn('[SPARK] server innerHTML: ', i)
+                console.warn('[SPARK] client innerHTML: ', elm.innerHTML)
               }
               return false
             }
@@ -653,13 +652,32 @@ export function createPatchFunction (backend) {
             // longer than the virtual children list.
             if (!childrenMatch || childNode) {
               /* istanbul ignore if */
-              if (process.env.NODE_ENV !== 'production' &&
-                typeof console !== 'undefined' &&
+              if (typeof console !== 'undefined' &&
                 !hydrationBailed
               ) {
                 hydrationBailed = true
-                console.warn('Parent: ', elm)
-                console.warn('Mismatching childNodes vs. VNodes: ', elm.childNodes, children)
+                // console.warn('[SPARK] Parent: ', elm)
+                console.warn('[SPARK] Mismatching childNodes vs. VNodes: ', elm.childNodes, children)
+                console.warn(`[SPARK] Parent: <${elm.tagName.toLowerCase()} class="${elm.classList}" />`)
+                
+                console.warn('[SPARK] Mismatching childNodes vs. VNodes: ')
+                elm.childNodes.forEach((child) => {
+                  console.warn(`childNode: <${child.tagName.toLowerCase()} class="${child.classList}" />`)
+                })
+
+                
+                if (typeof children === 'object') {
+                  console.warn(`vNode is object, keys: ${Object.keys(children)} values: ${Object.values(children)}`);
+                } else {
+                  children.forEach((child) => {
+                    if (child.tagName) {
+                      console.warn(`VNode: <${child.tagName.toLowerCase()} class="${child.classList}" />`)
+                    } else {
+                      console.warn(`VNode: ${JSON.stringify(child)}`)
+                    }
+                  })
+                }
+                throw new Error('Hydration failed');
               }
               return false
             }
